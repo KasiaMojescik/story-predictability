@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Word predictability</title>
+    <script src="./jsPsych/jspsych.js"></script>
+    <script src="./jsPsych/plugin-html-keyboard-response.js"></script>
+    <script src="./jsPsych/plugin-cloze.js"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.3"></script>
+    <link href="./jsPsych/jspsych.css" rel="stylesheet" type="text/css" />
+    	<!-- Get participant IDs passed in from URL -->
+    <script src="https://.//Assets/jquery.min.js"></script>
+    <script src="https://.//GetPpantIds.js"></script>
+    <script src="https://.//Assets/SetDateTime.js"></script>
+    <style>
+    .rating {
+        font-size: 15px;
+    }
+    .p {
+        font-size: 20px;
+    }
+    .highlight { 
+        color: red;
+    }
+    
+    input[type="range"] {
+        width: 250px;
+        margin: 0;
+    }
+    
+    </style>
+  </head>
+  <body>
+  <script>
+    const jsPsych = initJsPsych({
+        on_finish: function() {
+                    var P1 = SaveData().then(function(P1) {
+        		        var TargetUrl = P1.TargetUrl;
+        		        window.location.replace(TargetUrl);
+                    }).catch(function(Err) {
+                        alert('An error has occurred.\nPlease report error code #200 to the experimenter:\n'+Err);
+        		        window.location.replace("https://.//Error.html");
+                    });
+                }
+        //on_finish: function() {jsPsych.data.displayData();}
+    });
+
+    var initial_slider;
+    var initial_slider2;
+    var initial_slider3;
+
+    function compareNumbers(num1, num2, num3, num4, num5, num6) {
+        if ((num1 === num2) || (num3 === num4) || (num5 === num6)) {
+            alert("You did not submit response to at least one of the ratings in this trial. It will be noted to the experimenter. Please click on each slider in the next trial");
+        } 
+    }
+    
+    function initialise_sliders() { 
+        // Get the slider element
+        const slider = document.getElementById('decimalSlider');
+        const slider2 = document.getElementById('decimalSlider2');
+        // const slider3 = document.getElementById('decimalSlider3');
+        // const slider4 = document.getElementById('decimalSlider4');
+        // const slider5 = document.getElementById('decimalSlider5');
+        // const slider6 = document.getElementById('decimalSlider6');
+        
+        
+        // Generate a random decimal number between 1 and 7
+        const randomDecimal = (Math.random() * 6) + 1;
+        const randomDecimal2 = (Math.random() * 6) + 1;
+        // const randomDecimal3 = (Math.random() * 6) + 1;
+        // const randomDecimal4 = (Math.random() * 6) + 1;
+        // const randomDecimal5 = (Math.random() * 6) + 1;
+        // const randomDecimal6 = (Math.random() * 6) + 1;
+        
+        // Set the initial value of the slider to the random decimal number
+        slider.value = randomDecimal.toFixed(2); // Limit to 2 decimal places
+        slider2.value = randomDecimal2.toFixed(2); 
+        // slider3.value = randomDecimal3.toFixed(2); 
+        // slider4.value = randomDecimal4.toFixed(2); 
+        // slider5.value = randomDecimal5.toFixed(2); 
+        // slider6.value = randomDecimal6.toFixed(2); 
+        
+        initial_slider = slider.value;
+        initial_slider2 = slider2.value;
+        // initial_slider3 = slider3.value;
+        // initial_slider4 = slider4.value;
+        // initial_slider5 = slider5.value;
+        // initial_slider6 = slider6.value;
+    }
+    
+    
+    function save_trial(data) {
+         // store values
+        var temp0 = data.response;
+        // extract the response for the first slider
+        var temp = Number(temp0.first);   
+        data.responseFirst = temp;
+        data.initialFirst = initial_slider;
+        console.log(temp)
+        // extract the response for the second slider
+        var temp = Number(temp0.second);                  
+        data.responseSecond = temp;
+        data.initialSecond = initial_slider2;
+        console.log(temp)
+        // extract the response for the third slider
+        var temp = Number(temp0.third);                  
+        data.responseThird = temp;
+        data.initialThird = initial_slider3;
+        compareNumbers(data.responseFirst, Number(initial_slider), data.responseSecond,  Number(initial_slider2), data.responseThird, Number(initial_slider3))
+        console.log(temp)
+    }
+    
+    // SaveData function
+    function SaveData(){
+        var DataToSave = jsPsych.data.get().json();
+        var JsonPost = {
+            type: "POST",
+            url: './save.php',
+            dataType: 'json',
+            data: {FunctionCall: 'WriteData', Args: {
+    		    SubjectId: SubjectId,
+    		    DateTime_Start: DateTime_Start,
+    		    ClientTimeZone: ClientTimeZone,
+    		    JsonData: DataToSave,
+    		    Flag: 1
+    		}}
+        };
+        Response = jQuery.ajax(JsonPost);
+        return new Promise(resolve => {resolve(Response)});
+    }
+
+
+    var lily_story = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: '<p><br><br>Lily was doing her homework, sitting at a kitchen table. <br>All of a sudden, she <span class="highlight">[..............]</span>. <br>At first, she was frightened, but soon she realised it must have been her cat. <br>She checked the living room and noticed a broken planter on the floor.<br></p>',
+      html: 
+      '<br><p>heard a noise</p>'+ 
+      '<div class="rating">Very unpredictable&nbsp;&nbsp;<input name="first" type="range" min="1" max="7" step="0.01" id="decimalSlider" required>&nbsp;&nbsp;Very predictable</div>&nbsp;<br>' +
+      '<p>saw strange shadows</p>' +
+      '<div class="rating">Very unpredictable&nbsp;&nbsp;<input name="second" type="range" min="1" max="7" step="0.01" id="decimalSlider2" required>&nbsp;&nbsp;Very predictable</div>&nbsp;<br>' +
+      '<p>ate some bread</p>' +
+      '<div class="rating">Very unpredictable&nbsp;&nbsp;<input name="third" type="range" min="1" max="7" step="0.01" id="decimalSlider3" required>&nbsp;&nbsp;Very predictable</div>&nbsp;<br>' +
+      '<br><p>saw bright light</p>'+ 
+      '<div class="rating">Very unpredictable&nbsp;&nbsp;<input name="fourth" type="range" min="1" max="7" step="0.01" id="decimalSlider4" required>&nbsp;&nbsp;Very predictable</div>&nbsp;<br>',
+      button_label: 'Confirm',
+      data: {
+        task: 'Lily',
+      },
+      on_load: function(params) {
+        initialise_sliders();
+      },
+      on_finish: function(data){
+        save_trial(data);
+      }
+    }    
+    
+    
+    //var timeline = [museum_story1,museum_story2,castle_story1,castle_story2,takeaway_story1,takeaway_story2, family_story1, family_story2, artist_story1, //artist_story2, promotion_story1, promotion_story2, mother_story1, mother_story2, football_story1, football_story2, mountain_story1, mountain_story2, //park_story1, park_story2, cleaning_story1, cleaning_story2, sample_story1, sample_story2, birthday_story1, birthday_story2]
+   // var shuffledArray = jsPsych.randomization.repeat(timeline, 1);
+    //jsPsych.run(timeline);
+    jsPsych.run([lily_story]);
+    
+  </script>
+  </body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Word predictability</title>
+    <script src="./jsPsych/jspsych.js"></script>
+    <script src="./jsPsych/plugin-html-keyboard-response.js"></script>
+    <script src="./jsPsych/plugin-cloze.js"></script>
+    <link href="./jsPsych/jspsych.css" rel="stylesheet" type="text/css" />
+    	<!-- Get participant IDs passed in from URL -->
+    <script src="https://.//Assets/jquery.min.js"></script>
+    <script src="https://.//GetPpantIds.js"></script>
+    <script src="https://.//Assets/SetDateTime.js"></script>
+  </head>
+  <body>
+  <script>
+    const jsPsych = initJsPsych({
+        on_finish: function() {
+                    var P1 = SaveData().then(function(P1) {
+        		        var TargetUrl = P1.TargetUrl;
+        		        window.location.replace(TargetUrl);
+                    }).catch(function(Err) {
+                        alert('An error has occurred.\nPlease report error code #200 to the experimenter:\n'+Err);
+        		        window.location.replace("https://.//Error.html");
+                    });
+                }});
+    
+    // SaveData function
+    function SaveData(){
+        var DataToSave = jsPsych.data.get().json();
+        var JsonPost = {
+            type: "POST",
+            url: './save.php',
+            dataType: 'json',
+            data: {FunctionCall: 'WriteData', Args: {
+    		    SubjectId: SubjectId,
+    		    DateTime_Start: DateTime_Start,
+    		    ClientTimeZone: ClientTimeZone,
+    		    JsonData: DataToSave,
+    		    Flag: 1
+    		}}
+        };
+        Response = jQuery.ajax(JsonPost);
+        return new Promise(resolve => {resolve(Response)});
+    }
+
+    /* create timeline */
+    var timeline = [];
+    
+    var cloze_procedure = {
+    timeline: [
+        {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: '+',
+            choices: "NO_KEYS",
+            trial_duration: 500
+        },
+        {
+            type: jsPsychCloze,
+            text: jsPsych.timelineVariable('text'),
+            data: jsPsych.timelineVariable('name'),
+            allow_blanks: false,
+            mistake_fn: function() { alert('Please fill in all blanks.'); }
+        }
+    ],
+    timeline_variables: [
+        { text: 'test1', name: 'a'},
+        { text: 'test2', name: 'b'}
+    ], 
+    randomize_order: true
+}
+
+    timeline.push(cloze_procedure);
+    
+    jsPsych.run(timeline);
+  </script>
+  </body>
+</html>

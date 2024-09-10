@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Memories for stories</title>
+    <script src="./jsPsych/jspsych.js"></script>
+    <script src="./jsPsych/plugin-html-keyboard-response.js"></script>
+    <link href="./jsPsych/jspsych.css" rel="stylesheet" type="text/css" />
+    <!-- Unpack the main JSpsych module -->
+    <script src="https://unpkg.com/jspsych@7.3.3"></script>
+    
+    <!-- JSpsych dependency to preload audio files -->
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.2"></script>
+    
+    
+    <!-- JSpsych dependency to fullscreen -->
+    <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.1.2"></script>
+    
+    <!-- JSpsych dependency for audio button response -->
+    <script src="https://unpkg.com/@jspsych/plugin-audio-button-response@1.1.2"></script>
+    
+    <!-- JSpsych dependency for HTML button response -->
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2"></script>
+    
+    <!-- JSpsych dependency for styling -->
+    <link rel="stylesheet" href="https://unpkg.com/jspsych@7.3.3/css/jspsych.css" />
+    
+    <!-- Get jQuery -->
+    <script src="./Assets/jquery.min.js"></script>
+    
+    <!-- Set the favicon logo -->
+    <link rel="icon" href="./Logo.png" type="image/x-icon" />
+
+<style>
+html {margin: 0 auto;max-width: 600px;}
+
+.jspsych-display-element {
+  font-size: 25px;
+}
+
+</style>
+    	<!-- Get participant IDs passed in from URL -->
+    <script src="https://.//Assets/jquery.min.js"></script>
+    <script src="https://.//GetPpantIds.js"></script>
+    <script src="https://.//Assets/SetDateTime.js"></script>
+    <script src="https://.//stim.js"></script>
+  </head>
+  <body>
+  <script>
+    const jsPsych = initJsPsych({
+        on_finish: function() {
+                    var P1 = SaveData().then(function(P1) {
+        		        var TargetUrl = P1.TargetUrl;
+        		        window.location.replace(TargetUrl);
+                    }).catch(function(Err) {
+                        alert('An error has occurred.\nPlease report error code #200 to the experimenter:\n'+Err);
+        		        window.location.replace("https://.//Error.html");
+                    });
+                }});
+    
+    // SaveData function
+    function SaveData(){
+        var DataToSave = jsPsych.data.get().json();
+        var JsonPost = {
+            type: "POST",
+            url: './save.php',
+            dataType: 'json',
+            data: {FunctionCall: 'WriteData', Args: {
+    		    SubjectId: SubjectId,
+    		    DateTime_Start: DateTime_Start,
+    		    ClientTimeZone: ClientTimeZone,
+    		    JsonData: DataToSave,
+    		    Condition_Group: 'unpredictable_10min',
+    		    Flag: 1
+    		}}
+        };
+        Response = jQuery.ajax(JsonPost);
+        return new Promise(resolve => {resolve(Response)});
+    }
+    
+    // Specify the EnterFullscreen event
+    var EnterFullscreen = {
+        type: jsPsychFullscreen,
+        message: '<p style="color:black;">The task is ready to begin.</p><p style="color:black;">Please click the button below to continue.</p>',
+        fullscreen_mode: true,
+        delay_after: 1000,
+        on_finish: function() {EnforceUnfocus = true;}
+    };
+    
+    // Specify the ExitFullscreen event
+    var ExitFullscreen = {
+        type: jsPsychFullscreen,
+        fullscreen_mode: false,
+        on_finish: function() {EnforceUnfocus = false;}
+    };
+    
+    // Specify the SentenceTrial event
+    var break_story = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: 'This story has now ended. Press the \"Continue\" button to hear the next story.',
+        choices: ['Continue']
+    };
+    var pre_first_story = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: 'The first story is going to be displayed soon.',
+        choices: "NO_KEYS",
+        trial_duration: 
+        5000
+    };
+    var SentenceTrial = {
+        type: jsPsychAudioButtonResponse,
+        stimulus: function(){
+            return jsPsych.timelineVariable('Audio');
+        },
+        choices: [],
+        prompt: function(){
+            return jsPsych.timelineVariable('Text');
+        },
+        trial_ends_after_audio: true
+    };
+    
+    // Specify the TrialIndex global variable
+    var TrialIndex = -1;
+
+   // var StoryTimeline = [AmyStory,AmyStory];
+    // Specify the StoryLoop
+    var StoryLoopAmy = {
+        timeline: [SentenceTrial],
+        timeline_variables: AmyStory
+    };
+    
+    var StoryLoopLeo = {
+        timeline: [SentenceTrial],
+        timeline_variables: LeoStory
+    };
+    
+    var StoryLoopLuke = {
+        timeline: [SentenceTrial],
+        timeline_variables: LukeStory
+    };
+    
+    var StoryLoopDora = {
+        timeline: [SentenceTrial],
+        timeline_variables: DoraStory
+    };
+    
+    var StoryLoopCharlie = {
+        timeline: [SentenceTrial],
+        timeline_variables: CharlieStory
+    };
+    
+    var StoryLoopOliver = {
+        timeline: [SentenceTrial],
+        timeline_variables: OliverStory
+    };
+    
+    var StoryLoopLeo = {
+        timeline: [SentenceTrial],
+        timeline_variables: LeoStory
+    };
+    
+    var StoryLoopMary = {
+        timeline: [SentenceTrial],
+        timeline_variables: MaryStory
+    };
+    
+    var StoryLoopSteve = {
+        timeline: [SentenceTrial],
+        timeline_variables: SteveStory
+    };
+    
+    var StoryLoopRobert = {
+        timeline: [SentenceTrial],
+        timeline_variables: RobertStory
+    };
+    
+    var StoryLoopMichelle = {
+    timeline: [SentenceTrial],
+    timeline_variables: MichelleStory
+    };
+
+    var StoryLoopSusan = {
+    timeline: [SentenceTrial],
+    timeline_variables: SusanStory
+    };
+    
+    var StoryLoopDiane = {
+    timeline: [SentenceTrial],
+    timeline_variables: DianeStory
+    };
+
+
+    
+    var preload = {
+        type: jsPsychPreload,
+        auto_preload: true
+    }
+    
+    var timelineArray = [StoryLoopAmy,StoryLoopLeo, StoryLoopSusan, StoryLoopMichelle, StoryLoopRobert, StoryLoopSteve, StoryLoopMary, StoryLoopOliver, StoryLoopCharlie, StoryLoopDora, StoryLoopLuke, StoryLoopDiane
+    ]
+    
+    //  var timelineArray = [StoryLoopAmy]
+    
+    var shuffledArray = jsPsych.randomization.repeat(timelineArray, 1);
+    shuffledArray.splice(0, 0, preload);
+    shuffledArray.splice(1, 0, EnterFullscreen);
+    shuffledArray.splice(2, 0, pre_first_story);
+    for (let i = 0; i < shuffledArray.length; i++) {
+      if (i > 2 & i % 2 == 0) {
+        shuffledArray.splice(i, 0, break_story);
+      }
+    } 
+    shuffledArray.splice(shuffledArray.length, 0, ExitFullscreen);
+
+    // Run JSpysch
+    jsPsych.run(shuffledArray);
+
+  </script>
+  </body>
+</html>
